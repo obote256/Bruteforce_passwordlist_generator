@@ -1,0 +1,266 @@
+<html lang="en"><head>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRUTEFORCE PASSLIST</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #2d2d2d;
+            color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #3e3e3e;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        h1 {
+            color: #f8a5c2;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            transition: margin-bottom 0.3s;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #666;
+            border-radius: 4px;
+            background-color: #555;
+            color: #f5f5f5;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            background-color: #444;
+            border-color: #f8a5c2;
+            color: #f5f5f5;
+        }
+        .form-group button {
+            padding: 12px 20px;
+            background-color: #f8a5c2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .form-group button:hover {
+            background-color: #f77f9c;
+            transform: translateY(-2px);
+        }
+        .form-group button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        #passwords {
+            margin-top: 20px;
+        }
+        #passwords pre {
+            white-space: pre-wrap;
+            background-color: #444;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #666;
+            overflow-y: auto;
+            max-height: 300px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #passwords pre:hover {
+            background-color: #555;
+        }
+        #passwordCount {
+            margin-top: 10px;
+            font-weight: 700;
+        }
+        #credit {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #f5f5f5;
+        }
+        #credit a {
+            color: #f8a5c2;
+            text-decoration: none;
+        }
+        #credit a:hover {
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head><body><center>
+
+    <div class="container">
+        <h1>BRUTEFORCE PASSLIST</h1>
+        <div class="form-group">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName">
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName">
+        </div>
+        <div class="form-group">
+            <label for="dob">Date of Birth (20 May 2000):</label>
+            <input type="text" id="dob">
+        </div>
+        <div class="form-group">
+            <label for="nickname">Nickname:</label>
+            <input type="text" id="nickname">
+        </div>
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <input type="text" id="address">
+        </div>
+        <div class="form-group">
+            <label for="passwordLength">Password Length (4 to 30):</label>
+            <input type="number" id="passwordLength" min="4" max="30">
+        </div>
+        <div class="form-group">
+            <label>Add any numbers?</label>
+            <select id="addNumbers">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Choose any special characters?</label>
+            <select id="addSpecialChars">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </select>
+        </div>
+        <div id="specialCharsInput" class="form-group hidden">
+            <label for="specialChars">Enter special characters (e.g., !@#$%^&amp;*):</label>
+            <input type="text" id="specialChars">
+        </div>
+        <div class="form-group">
+            <button id="startGeneration">Start Generating</button>
+            <button id="stopGeneration" disabled="">Stop</button>
+            <button id="downloadFile" disabled="">Download File</button>
+        </div>
+        <div id="passwords">
+            <pre id="passwordList"></pre>
+        </div>
+        <div id="passwordCount">Generated Passwords: <span id="count">0</span></div>
+        <div id="credit">Credit: <a href="https://t.me/obote256" target="_blank">rootgearlab</a></div>
+    </div>
+    <script>
+        const startBtn = document.getElementById('startGeneration');
+        const stopBtn = document.getElementById('stopGeneration');
+        const downloadBtn = document.getElementById('downloadFile');
+        const passwordList = document.getElementById('passwordList');
+        const countSpan = document.getElementById('count');
+        const addNumbersSelect = document.getElementById('addNumbers');
+        const addSpecialCharsSelect = document.getElementById('addSpecialChars');
+        const specialCharsInput = document.getElementById('specialCharsInput');
+        const specialCharsInputField = document.getElementById('specialChars');
+        let generating = false;
+        let passwordArray = [];
+        let generatedCount = 0;
+
+        addSpecialCharsSelect.addEventListener('change', function() {
+            if (this.value === 'yes') {
+                specialCharsInput.classList.remove('hidden');
+            } else {
+                specialCharsInput.classList.add('hidden');
+            }
+        });
+
+        startBtn.addEventListener('click', function() {
+            if (generating) return;
+            generating = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            downloadBtn.disabled = true;
+            passwordList.textContent = '';
+            passwordArray = [];
+            generatedCount = 0;
+            countSpan.textContent = '0';
+            generatePasswords();
+        });
+
+        stopBtn.addEventListener('click', function() {
+            generating = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            downloadBtn.disabled = false;
+        });
+
+        downloadBtn.addEventListener('click', function() {
+            const blob = new Blob([passwordArray.join('\n')], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'passlisttcs.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        function generatePasswords() {
+            if (!generating) return;
+            const firstName = document.getElementById('firstName').value.trim().replace(/\s+/g, '');
+            const lastName = document.getElementById('lastName').value.trim().replace(/\s+/g, '');
+            const dob = document.getElementById('dob').value.trim().replace(/\s+/g, '');
+            const nickname = document.getElementById('nickname').value.trim().replace(/\s+/g, '');
+            const address = document.getElementById('address').value.trim().replace(/\s+/g, '');
+            const passwordLength = parseInt(document.getElementById('passwordLength').value.trim());
+            const addNumbers = addNumbersSelect.value === 'yes';
+            const addSpecialChars = addSpecialCharsSelect.value === 'yes';
+            const specialChars = specialCharsInputField.value.trim().replace(/\s+/g, '');
+
+            let inputDetails = [firstName, lastName, dob, nickname, address].filter(Boolean);
+            let inputChars = inputDetails.join('').split('');
+            if (addNumbers) inputChars = inputChars.concat('0123456789'.split(''));
+            if (addSpecialChars) inputChars = inputChars.concat(specialChars.split(''));
+
+            function generatePassword() {
+                let password = '';
+                for (let i = 0; i < passwordLength; i++) {
+                    password += inputChars[Math.floor(Math.random() * inputChars.length)];
+                }
+                return password;
+            }
+
+            function updateCount() {
+                countSpan.textContent = generatedCount;
+            }
+
+            function generateBatch() {
+                if (!generating) return;
+                const batchSize = 1000;
+                const passwords = [];
+                for (let i = 0; i < batchSize; i++) {
+                    const password = generatePassword();
+                    passwords.push(password);
+                }
+                passwordArray.push(...passwords);
+                passwordList.textContent += passwords.join('\n') + '\n';
+                generatedCount += batchSize;
+                updateCount();
+                setTimeout(generateBatch, 100);
+            }
+
+            generateBatch();
+        }
+    </script>
+
+
+
+</center></body></html>
